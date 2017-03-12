@@ -1,5 +1,6 @@
 const STREAM_SELECTOR = '.stream-component';
-const VIDEO_SELECTOR = 'video';
+const HEADER_SELECTOR = '[class*="styles_shadow"]';
+const CHAT_SELECTOR = '.chat-component';
 const INITIALIZE_RETRY_DELAY = 50;
 
 function makeNodeFullscreen(streamNode) {
@@ -11,6 +12,16 @@ function makeNodeFullscreen(streamNode) {
   streamNode.style.zIndex = 9999999999999;
 };
 
+function hideInterface() {
+  const header = document.querySelector(HEADER_SELECTOR);
+  const chat = document.querySelector(CHAT_SELECTOR);
+
+  header.style.opacity = 0;
+  header.style.zIndex = -1;
+  chat.style.opacity = 0;
+  chat.style.zIndex = -1;
+};
+
 var observerConfig = {
   attributes: true,
   childList: true,
@@ -19,14 +30,16 @@ var observerConfig = {
 };
 
 function main(streamNode) {
-  document.body.appendChild(streamNode);
+  hideInterface();
   makeNodeFullscreen(streamNode);
 
   const observer = new MutationObserver(mutations => {
-    mutations.forEach(mutation => makeNodeFullscreen(streamNode));
+    mutations.forEach(mutation => {
+      hideInterface();
+      makeNodeFullscreen(streamNode);
+    });
   });
-  document.getElementsByTagName(VIDEO_SELECTOR)[0].play();
-  observer.observe(streamNode, observerConfig);
+  observer.observe(document.body, observerConfig);
 }
 
 function initialize() {
@@ -39,4 +52,5 @@ function initialize() {
   }
 }
 
-window.onload = () => initialize();
+initialize();
+// window.addEventListener('load', initialize);
